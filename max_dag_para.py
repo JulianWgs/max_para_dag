@@ -35,22 +35,27 @@ def dag_para(graph):
         for node in graph.successors(next_node):
             n_successors = len(list(graph.successors(node)))
             n_predecessors = len(
+                [node for node in graph.predecessors(node)]
+            )
+            n_blocking = len(
                 [node for node in graph.predecessors(node) if node not in visited]
             )
             nodes[node] = {
                 "n_successors": n_successors,
                 "n_predecessors": n_predecessors,
+                "n_blocking": n_blocking,
             }
         nodes_filtered = {
-            key: value for key, value in nodes.items() if value["n_predecessors"] == 0
+            key: value for key, value in nodes.items() if value["n_blocking"] == 0
         }
         current_concurrency += len(list(graph.successors(next_node))) - len(
             list(graph.predecessors(next_node))
         )
         concurrency.append(current_concurrency)
         next_node = max(
-            nodes_filtered.items(), key=lambda item: item[1]["n_successors"]
-        )[0]
+            nodes_filtered.items(), key=lambda item: item[1]["n_successors"] - item[1]["n_predecessors"]
+        )
+        next_node = next_node[0]
         nodes.pop(next_node)
         visited.append(next_node)
     current_concurrency += len(list(graph.successors(next_node))) - len(

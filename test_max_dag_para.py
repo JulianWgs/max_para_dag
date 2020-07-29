@@ -56,3 +56,28 @@ def test_02():
     g.add_edge("I", "J")
 
     assert max_dag_para(g) == 4
+
+
+def test_03():
+    g = nx.DiGraph()
+
+    g.add_edge("A", "B")
+    g.add_edge("A", "C")
+    g.add_edge("A", "D")
+    g.add_edge("A", "E1")
+    g.add_edge("E1", "E")
+
+    g.add_edge("B", "G")
+    g.add_edge("C", "G")
+    g.add_edge("D", "G")
+
+    g.add_edge("E", "H")
+    g.add_edge("F", "H")
+    g.add_edge("E", "F")
+
+    g.add_edge("G", "J")
+    g.add_edge("G", "I")
+    g.add_edge("I", "J")
+    g.add_edge("H", "J")
+
+    assert max_dag_para(g) == 5
