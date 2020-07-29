@@ -1,6 +1,7 @@
 """
 Functions to get maximum number of concurrent tasks of a directed acyclic graph.
 """
+import uuid
 
 
 def max_dag_para(graph):
@@ -14,23 +15,33 @@ def dag_para(graph):
     """
     Get number of concurrent tasks and corresponding node.
 
-    Implementation currently does not support multiple origin or end nodes.
     """
 
-    # get start and end node, blocking nodes and difference of in- and output edges
+    graph = graph.copy()
+    # get start and end node
     n_predecessors_dict = dict()
     n_successors_dict = dict()
-    edge_sum = dict()
-    blocking = dict()
     for node in graph.nodes:
         n_predecessors_dict[node] = len(list(graph.predecessors(node)))
         n_successors_dict[node] = len(list(graph.successors(node)))
+    # Connect nodes with no predecessors to origin node and with successors to end node
+    # Give node of origin and end need an unique name
+    origins = [key for key, value in n_predecessors_dict.items() if value == 0]
+    origin = "origin_" + uuid.uuid4().hex[:8]
+    for node in origins:
+        graph.add_edge(origin, node)
+    ends = [key for key, value in n_successors_dict.items() if value == 0]
+    end = "end_" + uuid.uuid4().hex[:8]
+    for node in ends:
+        graph.add_edge(node, end)
+    # get blocking nodes and difference of in- and output edges
+    edge_sum = dict()
+    blocking = dict()
+    for node in graph.nodes:
         edge_sum[node] = len(list(graph.successors(node))) - len(
             list(graph.predecessors(node))
         )
-        blocking[node] = graph.predecessors(node)
-    origin = [key for key, value in n_predecessors_dict.items() if value == 0][0]
-    end = [key for key, value in n_successors_dict.items() if value == 0][0]
+        blocking[node] = list(graph.predecessors(node))
     visited = {origin}
     next_node = origin
     concurrency = edge_sum[next_node]

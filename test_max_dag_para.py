@@ -81,3 +81,30 @@ def test_03():
     g.add_edge("H", "J")
 
     assert max_dag_para(g) == 5
+
+
+def test_many_to_many():
+    g = nx.DiGraph()
+
+    g.add_edge("A1", "B1")
+    g.add_edge("A2", "B2")
+
+    assert max_dag_para(g) == 2
+
+
+def test_one_to_many():
+    g = nx.DiGraph()
+
+    g.add_edge("A", "B1")
+    g.add_edge("A", "B2")
+
+    assert max_dag_para(g) == 2
+
+
+def test_many_to_one():
+    g = nx.DiGraph()
+
+    g.add_edge("A1", "B")
+    g.add_edge("A2", "B")
+
+    assert max_dag_para(g) == 2
